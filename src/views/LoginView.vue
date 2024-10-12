@@ -59,6 +59,8 @@
         try {
           const data = await authService.login(this.form);
           // Armazenar o token e redirecionar para a página principal
+          console.log(localStorage.getItem('auth_token'));
+
           console.log(data);
           localStorage.setItem('authToken', data.token);
           this.$router.push('/');
