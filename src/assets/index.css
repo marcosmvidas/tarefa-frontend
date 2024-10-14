@@ -1,3 +1,105 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary: #4ade80;
+  --primary-alt: #22c55e;
+  --grey: #64748b;
+  --dark: #1e293b;
+  --dark-alt: #334155;
+  --light: #f1f5f9;
+  --sidebar-width: 300px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Fira Sans', sans-serif;
+}
+
+body {
+  background: var(--light);
+}
+
+button {
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+#home-page {
+  display: flex;
+
+  main {
+    flex: 1 1 0;
+    padding: 2rem;
+
+    @media (max-width: 1024px) {
+      padding-left: 6rem;
+    }
+  }
+}
+
+footer {
+  margin-top: auto;
+}
+
+/* Estilos para o input */
+.input-base {
+  position: relative;
+  display: block;
+  padding: 0.625rem 0.5rem;
+  width: 100%;
+  font-size: 0.875rem; /* text-sm */
+  color: #1f2937; /* text-gray-900 */
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #d1d5db; /* border-gray-300 */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-base:focus {
+  border-color: #3b82f6; /* focus:border-blue-600 */
+  outline: none;
+  box-shadow: 0 1px 0 0 #3b82f6; /* focus:ring-0 */
+}
+
+.input-base::placeholder {
+  color: #6b7280; /* text-gray-500 */
+}
+
+/* Modo escuro */
+@media (prefers-color-scheme: dark) {
+  .input-base {
+    color: #ffffff; /* text-white */
+    border-color: #4b5563; /* border-gray-600 */
+  }
+
+  .input-base:focus {
+    border-color: #3b82f6; /* focus:border-blue-600 */
+  }
+}
+
+/* Estilos para o label */
+.label-base {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.5rem;
+  font-size: 0.875rem; /* text-sm */
+  color: #6b7280; /* text-gray-500 */
+  transition: transform 0.2s, font-size 0.2s, color 0.2s;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+/* Efeito de transição quando o input está focado ou não tem placeholder */
+.input-base:focus + .label-base,
+.input-base:not(:placeholder-shown) + .label-base {
+  font-weight: 500; /* font-medium */
+  color: #3b82f6; /* text-blue-600 */
+  transform: translateY(-1.5rem) scale(0.75);
+}

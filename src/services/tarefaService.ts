@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { api } from '../config/api';
 import { TarefaTypes } from '../types/TarefaTypes';
 
@@ -11,7 +10,6 @@ export const TarefaService = {
       return response.data;
     } catch (error) {
       showSnackBar('Erro ao obter tarefas:');
-      console.error(error); // Adicionando log do erro
       throw new Error('Erro ao obter tarefas');
     }
   },
@@ -54,4 +52,14 @@ export const TarefaService = {
       throw new Error(`Erro ao deletar tarefa com ID ${id}`);
     }
   },
+
+  async fetchFormStructure(showSnackBar: (message: string) => void) {
+    try {
+      const response = await api.get('/tarefas/form-structure');
+      return response.data;
+    } catch (error) {
+      showSnackBar('Erro ao obter a estrutura do formulário');
+      throw new Error('Erro ao obter a estrutura do formulário');
+    }
+  }
 };

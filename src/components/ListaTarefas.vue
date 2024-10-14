@@ -1,9 +1,19 @@
+<!-- eslint-disable vue/no-parsing-error -->
+<!-- eslint-disable vue/no-unused-components -->
 <template>
   <div class="text-right mr-4 mb-4">
-    <button class="bg-green-500 rounded-lg cursor-pointer px-4">
-      <span class="text-white">Cadastrar tarefa</span>
+    <button
+      class="bg-green-500 rounded-lg cursor-pointer px-4"
+      @click="openFormTarefa"
+    >
+      <span class="text-white">Cadastrar tarefa </span>
     </button>
   </div>
+  <!-- Formulário para cadastrar ou editar tarefas -->
+  <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
+      <FormularioTarefa @close="closeFormTarefa" />
+    >
+  </modalcomponent_>
   <div>
     <table class="min-w-full border-collapse border border-gray-200 p-4">
       <thead class="bg-gray-600 text-white p-3">
@@ -17,9 +27,9 @@
         </tr>
       </thead>
       <tbody>
-        <template v-if="tarefas">
+        <template v-if="tarefas && tarefas.length">
           <RowStatusComponent
-            v-for="(tarefa, index) in tarefas" 
+            v-for="(tarefa, index) in tarefas"
             :key="`${tarefa.id}-${index}`"
             :status="tarefa.status"
           >
@@ -29,27 +39,25 @@
             <td>{{ tarefa.conclusao_em }}</td>
             <td>{{ tarefa.status }}</td>
             <td class="text-right px-6 py-2">
-              <button @click="tarefaEditar(tarefa)">
-                <PencilIcon class="h-5 w-5 text-blue-500 hover:text-blue-700" />
-              </button>
-              <button @click="tarefaConcluir(tarefa)">
-                <CheckIcon class="h-5 w-5 text-green-500 hover:text-green-700" />
-              </button>
-              <button @click="tarefaExcluir(tarefa)">
-                <TrashIcon class="h-5 w-5 text-red-400 hover:text-red-700" />
-              </button>
+              <ButtonActionComponent
+                @edit="tarefaEditar(tarefa)"
+                @delete="tarefaExcluir(tarefa)"
+                @list="tarefaListar(tarefa)"
+              />
             </td>
           </RowStatusComponent>
         </template>
         <tr v-else>
-          <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">Nenhuma tarefa disponível</td>
+          <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">
+            Nenhuma tarefa disponível
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <SnackbarComponent 
-      :show="snackbarVisible" 
-      :message="snackbarMessage" 
+    <SnackbarComponent
+      :show="snackbarVisible"
+      :message="snackbarMessage"
       @close="snackbarVisible = false"
       type="error"
     />
@@ -61,15 +69,23 @@ import { defineComponent, PropType, ref, onMounted } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
 import { TarefaService } from '../services/tarefaService';
 import SnackbarComponent from './../components/SnackbarComponent.vue';
-import { TrashIcon, PencilIcon, CheckIcon } from '@heroicons/vue/24/solid';
 import RowStatusComponent from './StatusBadgeComponent.vue';
+import ButtonActionComponent from './ButtonActionComponent.vue';
+import FormularioTarefa from './FormularioTarefa.vue';
+import modalcomponent_ from './_ModalComponent.vue';
 
 export default defineComponent({
   name: 'ListaTarefas',
-  components: { SnackbarComponent, RowStatusComponent, TrashIcon, PencilIcon, CheckIcon },
+  components: {
+    SnackbarComponent,
+    RowStatusComponent,
+    ButtonActionComponent,
+    FormularioTarefa,
+    modalcomponent_
+  },
   props: {
     listTarefas: {
-      type: Array as PropType<TarefaTypes[]>,
+      type: (Array as PropType<TarefaTypes[]>) || [],
       required: true,
     },
   },
@@ -78,6 +94,8 @@ export default defineComponent({
     const snackbarVisible = ref(false);
     const snackbarMessage = ref('');
     const tarefas = ref<TarefaTypes[]>(props.listTarefas);
+    const isFormVisible = ref(false);
+    const selectedTarefa = ref<TarefaTypes | null>(null); // Adicione esta linha
 
     const showSnackbar = (message: string) => {
       snackbarMessage.value = message;
@@ -95,7 +113,13 @@ export default defineComponent({
     };
 
     const tarefaEditar = (tarefa: TarefaTypes) => {
+      selectedTarefa.value = tarefa; // Define a tarefa selecionada para edição
+      isFormVisible.value = true; // Mostra o formulário
       emit('edit-tarefa', tarefa);
+    };
+
+    const tarefaListar = (tarefa: TarefaTypes) => {
+      console.log('Consultando tarefa:', tarefa);
     };
 
     const tarefaConcluir = (tarefa: TarefaTypes) => {
@@ -109,6 +133,40 @@ export default defineComponent({
       // Aqui você pode implementar a chamada de serviço para deletar a tarefa
     };
 
+    const openFormTarefa = () => {
+      console.log("open formulario ");
+      isFormVisible.value = true;
+      selectedTarefa.value = null; // Limpa a seleção para uma nova tarefa
+    };
+
+    const saveTarefa = async (tarefa: TarefaTypes) => {
+      try {
+        if (selectedTarefa.value) {
+          if (selectedTarefa.value.id !== undefined) {
+            await TarefaService.updateTarefa(
+              selectedTarefa.value.id,
+              tarefa,
+              showSnackbar,
+            );
+            showSnackbar(`Tarefa # ${tarefa.id} atualizada!`);
+          }
+          // Atualiza a tarefa existente
+        } else {
+          // Cria uma nova tarefa
+          await TarefaService.createTarefa(tarefa, showSnackbar);
+          showSnackbar(`Tarefa # ${tarefa.tarefa} cadastrada!`);
+        }
+        await listaTarefa(); // Atualiza a lista de tarefas
+        isFormVisible.value = false; // Fecha o formulário
+      } catch (error) {
+        console.error('Erro ao salvar a tarefa:', error);
+        showSnackbar('Erro ao salvar a tarefa!');
+      }
+    };
+
+    const closeFormTarefa = () => {
+      isFormVisible.value = false;
+    };
     onMounted(() => {
       listaTarefa();
     });
@@ -121,6 +179,12 @@ export default defineComponent({
       tarefaEditar,
       tarefaConcluir,
       tarefaExcluir,
+      tarefaListar,
+      openFormTarefa,
+      isFormVisible,
+      selectedTarefa,
+      saveTarefa,
+      closeFormTarefa,
     };
   },
 });

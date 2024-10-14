@@ -1,49 +1,113 @@
 <template>
-  <form @submit.prevent="submitTask" class="max-w-lg mx-auto bg-white p-6 shadow-md rounded">
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Tarefa:</label>
-      <input v-model="form.tarefa" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+    <h2 class="p-6 font-bold text-blue-600 bg-slate-200">Cadastro de tarefa </h2>
+    <form @submit.prevent="submitTask" class="grid grid-cols-12 gap-2 p-12 mb-5">
+    <div class="md:col-span-8">
+      <div class="relative z-0 w-1/2 mb-5 group">
+        <div class="relative">
+          <input
+            name="floating_tarefa"
+            v-model="form.tarefa"
+            required
+            class="input-base"
+            placeholder=""
+          />
+          <label for="floating_tarefa" class="label-base">Tarefa</label>
+        </div>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Descrição:</label>
-      <textarea v-model="form.descricao" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+
+    <div class="md:col-span-12">
+      <div class="relative z-0 w-1/2 mb-5 group">
+        <div class="relative">
+          <textarea
+            name="floating_descricao"
+            v-model="form.descricao"
+            required
+            class="input-base h-24"
+            placeholder=""
+          >
+          </textarea>
+          <label for="floating_descricao" class="label-base">Descrição</label>
+        </div>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Responsável:</label>
-      <input v-model="form.responsavel" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+    <div class="md:col-span-8">
+      <div class="relative z-0 w-1/2 mb-5 group">
+        <div class="relative">
+          <input
+            name="floating_responsavel"
+            v-model="form.responsavel"
+            required
+            class="input-base"
+            placeholder=""
+          />
+          <label for="floating_responsavel" class="label-base">Responsável</label>
+        </div>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de Desenvolvimento:</label>
-      <select v-model="form.tipo_desenvolvimento" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        <option value="backend">Backend</option>
-        <option value="frontend">Frontend</option>
-        <option value="fullstack">Fullstack</option>
-      </select>
+
+    <div class="md:col-span-8">
+      <div class="relative z-0 w-1/2 mb-5 group">
+        <div class="relative">
+          <select v-model="form.tipo_desenvolvimento" class="input-base">
+            <option value="backend">Backend</option>
+            <option value="frontend">Frontend</option>
+            <option value="fullstack">Fullstack</option>
+          </select>
+          <label for="floating_tipo_desenvolvimento" class="label-base">Desenvolvimento</label>
+        </div>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Nível de Dificuldade:</label>
-      <select v-model="form.nivel_dificuldade" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        <option value="facil">Fácil</option>
-        <option value="medio">Médio</option>
-        <option value="dificil">Difícil</option>
-      </select>
+
+    <div class="md:col-span-4">
+      <div class="relative z-0 w-1/2 mb-5 group">
+        <div class="relative">
+          <select v-model="form.nivel_dificuldade" class="input-base">
+            <option value="facil">Fácil</option>
+            <option value="medio">Médio</option>
+            <option value="dificil">Difícil</option>
+          </select>
+          <label for="floating_tipo_dificuldade" class="label-base">Nível de Dificuldade</label>
+        </div>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
-      <input v-model="form.status" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+    <div class="md:col-span-4">
+      <div class="relative">
+        <input
+          type="date"
+          v-model="form.conclusao_em"
+          required
+          class="input-base"
+        />
+        <label for="floating_conclusao" class="label-base">Conclusão em</label>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Conclusão em:</label>
-      <input type="date" v-model="form.conclusao_em" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-    </div>
-    <div class="mb-6">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Concluída:</label>
-      <input type="checkbox" v-model="form.concluida" class="mr-2 leading-tight" />
+
+    <div class="md:col-span-4">
+      <label class="block text-blue-700 text-xs mb-2">Concluída:</label>
+      <input
+        type="checkbox"
+        v-model="form.concluida"
+        class="mr-2 leading-tight"
+      />
       <span class="text-sm">Sim</span>
     </div>
-    <div class="flex items-center justify-between">
-      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+
+    <div class="md:col-span-12 flex justify-end mt-4">
+      <button
+        type="submit"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
         Salvar
+      </button>
+      <button
+        type="button"
+        @click="cancel"
+        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
+      >
+        Cancelar
       </button>
     </div>
   </form>
@@ -75,11 +139,20 @@ export default defineComponent({
           form.value = { ...newTarefa };
         }
       },
-      { immediate: true }
+      { immediate: true },
     );
 
     const submitTask = () => {
       emit('save-task', form.value);
+      resetForm();
+    };
+
+    const cancel = () => {
+      resetForm();
+      emit('close');
+    };
+
+    const resetForm = () => {
       form.value = {
         tarefa: '',
         descricao: '',
@@ -88,13 +161,16 @@ export default defineComponent({
         nivel_dificuldade: 'facil',
         status: '',
         concluida: false,
-      }; // Reseta o formulário após salvar
+      };
     };
 
     return {
       form,
       submitTask,
+      cancel,
     };
   },
 });
 </script>
+
+<style scoped></style>

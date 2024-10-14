@@ -2,20 +2,17 @@
   <div>
     <h2>Gerenciamento de Tarefas</h2>
     <!-- Aqui pode ficar a lista de tarefas, o botão para adicionar e o form de edição -->
-    <ListaTarefas :tarefas="tarefas" @editar="editarTarefa" @excluir="excluirTarefa" />
     <FormularioTarefa @salvar="salvarTarefa" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import ListaTarefas from '@/components/ListaTarefas.vue';
 import FormularioTarefa from '@/components/FormularioTarefa.vue';
 import { TarefaTypes } from './../types/TarefaTypes';
 
 export default defineComponent({
   components: {
-    ListaTarefas,
     FormularioTarefa,
   },
   setup() {
