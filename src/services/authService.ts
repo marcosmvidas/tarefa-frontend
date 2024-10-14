@@ -6,8 +6,8 @@ export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       const response = await api.post('login', credentials);
-      const token = response.data.token; // Certifique-se de que o token é retornado no login
-      localStorage.setItem('token', token); // Armazena o token no localStorage
+      const token = response.data.token;
+      localStorage.setItem('token', token);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Erro ao fazer login');
@@ -15,10 +15,10 @@ export const authService = {
   },
   
   logout: () => {
-    localStorage.removeItem('token'); // Remove o token ao deslogar
+    localStorage.removeItem('token');
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('token'); // Retorna true se o token existir
+    return !!localStorage.getItem('token');
   }
 };

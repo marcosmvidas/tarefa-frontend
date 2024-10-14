@@ -1,80 +1,60 @@
 <template>
-    <div class="h-screen flex items-center justify-center">
-      <div class="w-full max-w-md">
-        <form @submit.prevent="login">
-          <h2 class="text-2xl font-bold text-center mb-4">Login</h2>
-          
-          <InputField
-            id="email"
-            label="Email"
-            type="email"
-            placeholder="Digite seu email"
-            v-model="form.email"
-          />
-          
-          <InputField
-            id="password"
-            label="Senha"
-            type="password"
-            placeholder="Digite sua senha"
-            v-model="form.password"
-          />
-          
-          <Button
-            :label="'Entrar'"
-            :loading="loading"
-            type="submit"
-          />
-          
-          <div v-if="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</div>
-        </form>
-      </div>
-    </div>
-  </template>
-  
-  <script>
-  import { authService } from '../services/authService';
-  import InputField from '../components/InputField.vue';
-  import Button from '../components/Button.vue';
-  
-  export default {
-    components: {
-      InputField,
-      Button,
-    },
-    data() {
-      return {
-        form: {
-          email: '',
-          password: '',
-        },
-        loading: false,
-        errorMessage: null,
-      };
-    },
-    methods: {
-      async login() {
-        this.loading = true;
-        this.errorMessage = null;
-        try {
-          const data = await authService.login(this.form);
-          // Armazenar o token e redirecionar para a página principal
-          console.log(localStorage.getItem('auth_token'));
+  <div>
+    <h1>Login</h1>
+    <form @submit.prevent="login">
+      <input v-model="form.email" type="email" placeholder="Email" required />
+      <input v-model="form.password" type="password" placeholder="Password" required />
+      <button type="submit" :disabled="loading">Login</button>
+    </form>
+    <div v-if="errorMessage">{{ errorMessage }}</div>
+  </div>
+</template>
 
-          console.log(data);
-          localStorage.setItem('authToken', data.token);
-          this.$router.push('/');
-        } catch (error) {
-          this.errorMessage = error.message;
-        } finally {
-          this.loading = false;
-        }
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  /* Estilo adicional, caso necessário */
-  </style>
-  
+<script lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { authService } from '../services/authService';
+import { LoginCredentials } from '../types/AuthTypes'; // Certifique-se de que este tipo existe
+
+export default {
+  setup() {
+    const router = useRouter();
+    
+    // Definindo as reativas
+    const form = ref<LoginCredentials>({
+      email: '',
+      password: ''
+    });
+    const loading = ref(false);
+    const errorMessage = ref<string | null>(null);
+
+    // Função de login
+    const login = async () => {
+      loading.value = true;
+      errorMessage.value = null;
+
+      try {
+        const data = await authService.login(form.value);
+        localStorage.setItem('auth_token', data.token); // Use a mesma chave para o token
+        router.push('/'); // Redireciona após o login
+      } catch (error) {
+        errorMessage.value = (error as Error).message; // Captura a mensagem de erro
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    // Retornando os dados e métodos que serão utilizados no template
+    return {
+      form,
+      loading,
+      errorMessage,
+      login,
+    };
+  }
+};
+</script>
+
+<style scoped>
+/* Adicione seu estilo aqui */
+</style>
