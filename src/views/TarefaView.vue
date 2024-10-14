@@ -12,6 +12,7 @@ import { defineComponent } from 'vue';
 import ListaTarefas from '@/components/ListaTarefas.vue'
 
 export default defineComponent({
+  
   components: {
    ListaTarefas,
   },

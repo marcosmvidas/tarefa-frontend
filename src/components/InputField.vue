@@ -1,14 +1,14 @@
-<!-- InputField.vue -->
 <template>
   <div class="mb-4">
-    <label :for="id" class="block text-gray-700 text-sm font-bold mb-2">{{ label }}</label>
+    <label :for="id" class="label-base">{{ label }}</label>
     <input
       :id="id"
       :type="type"
-      :value="modelValue"
       :placeholder="placeholder"
-      @input="$emit('update:modelValue', $event.target.value)"
-      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+      :value="modelValue"
+      @input="handleInput"
+      :class="['input-base', inputClasses]"
+      v-bind="$attrs"
     />
   </div>
 </template>
@@ -38,6 +38,22 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    inputClasses: {
+      type: String,
+      default: '',
+    },
+  },
+  methods: {
+    handleInput(event: Event) {
+      const target = event.target as HTMLInputElement;
+      if (target) {
+        this.$emit('update:modelValue', target.value);
+      }
+    },
   },
 });
 </script>
+
+<style scoped>
+/* Se houver estilizações específicas adicionais, elas podem ser adicionadas aqui */
+</style>

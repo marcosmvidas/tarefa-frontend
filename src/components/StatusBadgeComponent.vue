@@ -19,13 +19,13 @@
       getStatusClass(): string {
         switch (this.status) {
           case 'concluída':
-            return 'bg-green-100';
+            return 'text-green-600';
           case 'Aberta':
-            return 'bg-yellow-100';
+            return 'text-orange-600';
           case 'atrasada':
             return 'bg-red-100';
           default:
-            return 'bg-orange-300';
+            return 'text-blue-600';
         }
       },
     },
