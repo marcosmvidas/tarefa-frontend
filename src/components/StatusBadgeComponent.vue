@@ -21,7 +21,7 @@
           case 'concluída':
             return 'text-green-600';
           case 'Aberta':
-            return 'text-orange-600';
+            return 'text-gray-600';
           case 'atrasada':
             return 'bg-red-100';
           default:

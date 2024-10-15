@@ -1,5 +1,9 @@
 <template>
-  <div class="text-right mr-4 mb-4">
+<div>
+    <h1>Gerenciar Tarefas</h1>
+    <p>Você é um: {{ userRole }}</p>
+    </div>
+    <div class="text-right mr-4 mb-4">
     <button
       class="bg-green-500 rounded-lg cursor-pointer px-4"
       @click="openFormTarefa"
@@ -60,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
 import { TarefaService } from '../services/tarefaService';
 import SnackbarComponent from './../components/SnackbarComponent.vue';
@@ -68,6 +72,7 @@ import RowStatusComponent from './StatusBadgeComponent.vue';
 import ButtonActionComponent from './ButtonActionComponent.vue';
 import FormularioTarefa from './FormularioTarefa.vue';
 import modalcomponent_ from './_ModalComponent.vue';
+import { authService } from '@/services/authService';
 
 export default defineComponent({
   name: 'ListaTarefas',
@@ -84,7 +89,12 @@ export default defineComponent({
     const tarefas = ref<TarefaTypes[]>([]);
     const isFormVisible = ref(false);
     const selectedTarefa = ref<TarefaTypes | null>(null);
+    const roleId = ref(authService.getRoleId());
 
+
+    const userRole = computed(() => {
+      return roleId.value === 1 ? 'Gestor' : 'Usuário Comum';
+    });
     const showSnackbar = (message: string) => {
       snackbarMessage.value = message;
       snackbarVisible.value = true;
@@ -95,7 +105,7 @@ export default defineComponent({
         const response = await TarefaService.getAllTarefas(showSnackbar);
         tarefas.value = Array.isArray(response) ? response : [response];
       } catch (error) {
-        console.error('Erro ao buscar tarefas:', error);
+        showSnackbar(`Tarefa ao listar as tarefas!`);
       }
     };
 
@@ -153,6 +163,7 @@ export default defineComponent({
       selectedTarefa,
       saveTarefa,
       closeFormTarefa,
+      userRole
     };
   },
 });

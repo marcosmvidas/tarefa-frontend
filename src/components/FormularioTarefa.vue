@@ -2,7 +2,6 @@
   <h2 class="p-6 font-bold text-blue-600 bg-slate-200">
     <strong>CADASTRO TAREFA </strong>
     <p class="text-blue-400">{{ tarefatask ? 'Edição' : 'Inclusão' }}</p>
-    
   </h2>
 
   <form @submit.prevent="submitTask" class="grid grid-cols-12 gap-2 p-12 mb-5">
@@ -39,20 +38,6 @@
     <div class="md:col-span-8">
       <div class="relative z-0 w-1/2 mb-5 group">
         <div class="relative">
-          <input
-            name="floating_responsavel"
-            v-model="form.responsavel"
-            required
-            class="input-base"
-            placeholder=""
-          />
-          <label for="floating_responsavel" class="label-base">Responsável</label>
-        </div>
-      </div>
-    </div>
-    <div class="md:col-span-8">
-      <div class="relative z-0 w-1/2 mb-5 group">
-        <div class="relative">
           <select
             v-model="form.responsavel"
             required
@@ -67,6 +52,7 @@
         </div>
       </div>
     </div>
+
     <div class="md:col-span-8">
       <div class="relative z-0 w-1/2 mb-5 group">
         <div class="relative">
@@ -88,7 +74,7 @@
             <option value="Difícil">Difícil</option>
             <option value="Moderada">Moderada</option>
             <option value="Intermediária">Intermediária</option>
-            <option value="Fácil">Intermediária</option>
+            <option value="Fácil">Fácil</option>
           </select>
           <label for="floating_nivel_dificuldade" class="label-base">Grau de dificuldade</label>
         </div>
@@ -105,6 +91,17 @@
         />
         <label for="floating_conclusao" class="label-base">Conclusão em</label>
       </div>
+    </div>
+
+    <div class="md:col-span-4">
+      <label class="block text-blue-700 text-xs mb-2">Status:</label>
+      <select v-model="form.status" class="input-base">
+        <option value="Aberta">Aberta</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Cancelada">Cancelada</option>
+        <option value="Fechada">Fechada</option>
+      </select>
+      <label class="label-base">Status da Tarefa</label>
     </div>
 
     <div class="md:col-span-4">
@@ -146,13 +143,12 @@ export default defineComponent({
   },
 
   setup(props, { emit }) {
-    const users = ref<{ id: number; name: string }[]>([]); // Array para armazenar os usuários
+    const users = ref<{ id: number; name: string }[]>([]);
 
     const fetchUsers = async () => {
       try {
         const response = await UserService.getAllUsers((message) => {
-          console.log('const response do user ', response);
-          console.error(message); // Lidar com o erro
+          console.error(message);
         });
         users.value = response;
       } catch (error) {
@@ -160,7 +156,6 @@ export default defineComponent({
       }
     };
 
-    // Chama a função para buscar usuários quando o componente é montado
     fetchUsers();
 
     const form = ref<TarefaTypes>({
@@ -169,7 +164,7 @@ export default defineComponent({
       responsavel: '',
       tipo_desenvolvimento: 'backend',
       nivel_dificuldade: 'facil',
-      status: 'Aberta',
+      status: 'Aberta', // Definindo "Aberta" como padrão
       concluida: false,
       conclusao_em: '',
     });
@@ -181,20 +176,19 @@ export default defineComponent({
         responsavel: '',
         tipo_desenvolvimento: 'backend',
         nivel_dificuldade: 'facil',
-        status: 'Aberta',
+        status: 'Aberta', // Mantendo "Aberta" como padrão
         concluida: false,
         conclusao_em: '',
       };
     };
 
-    // Watcher para atualizar o formulário ao receber nova tarefa
     watch(
       () => props.tarefatask,
       (newTarefa) => {
         if (newTarefa) {
-          form.value = { ...newTarefa }; // Carrega dados da tarefa para o formulário
+          form.value = { ...newTarefa };
         } else {
-          resetForm(); // Reseta o formulário se não houver tarefa
+          resetForm();
         }
       },
       { immediate: true },
@@ -202,12 +196,12 @@ export default defineComponent({
 
     const submitTask = () => {
       emit('save-task', form.value);
-      resetForm(); // Reseta o formulário após salvar
+      resetForm();
     };
 
     const cancel = () => {
-      resetForm(); // Reseta o formulário ao cancelar
-      emit('close'); // Emite evento de fechar
+      resetForm();
+      emit('close');
     };
 
     return {
