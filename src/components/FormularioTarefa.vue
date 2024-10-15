@@ -1,6 +1,11 @@
 <template>
-    <h2 class="p-6 font-bold text-blue-600 bg-slate-200">Cadastro de tarefa </h2>
-    <form @submit.prevent="submitTask" class="grid grid-cols-12 gap-2 p-12 mb-5">
+  <h2 class="p-6 font-bold text-blue-600 bg-slate-200">
+    <strong>CADASTRO TAREFA </strong>
+    <p class="text-blue-400">{{ tarefatask ? 'Edição' : 'Inclusão' }}</p>
+    
+  </h2>
+
+  <form @submit.prevent="submitTask" class="grid grid-cols-12 gap-2 p-12 mb-5">
     <div class="md:col-span-8">
       <div class="relative z-0 w-1/2 mb-5 group">
         <div class="relative">
@@ -25,8 +30,7 @@
             required
             class="input-base h-24"
             placeholder=""
-          >
-          </textarea>
+          ></textarea>
           <label for="floating_descricao" class="label-base">Descrição</label>
         </div>
       </div>
@@ -46,29 +50,47 @@
         </div>
       </div>
     </div>
-
+    <div class="md:col-span-8">
+      <div class="relative z-0 w-1/2 mb-5 group">
+        <div class="relative">
+          <select
+            v-model="form.responsavel"
+            required
+            class="input-base"
+          >
+            <option value="" disabled selected>Selecione um responsável</option>
+            <option v-for="user in users" :key="user.id" :value="user.name">
+              {{ user.name }}
+            </option>
+          </select>
+          <label class="label-base">Responsável</label>
+        </div>
+      </div>
+    </div>
     <div class="md:col-span-8">
       <div class="relative z-0 w-1/2 mb-5 group">
         <div class="relative">
           <select v-model="form.tipo_desenvolvimento" class="input-base">
-            <option value="backend">Backend</option>
-            <option value="frontend">Frontend</option>
-            <option value="fullstack">Fullstack</option>
+            <option value="Backend">Backend</option>
+            <option value="Frontend">Frontend</option>
+            <option value="Banco de dados">Banco de dados</option>
+            <option value="Infra">Infra</option>
           </select>
           <label for="floating_tipo_desenvolvimento" class="label-base">Desenvolvimento</label>
         </div>
       </div>
     </div>
 
-    <div class="md:col-span-4">
+    <div class="md:col-span-8">
       <div class="relative z-0 w-1/2 mb-5 group">
         <div class="relative">
           <select v-model="form.nivel_dificuldade" class="input-base">
-            <option value="facil">Fácil</option>
-            <option value="medio">Médio</option>
-            <option value="dificil">Difícil</option>
+            <option value="Difícil">Difícil</option>
+            <option value="Moderada">Moderada</option>
+            <option value="Intermediária">Intermediária</option>
+            <option value="Fácil">Intermediária</option>
           </select>
-          <label for="floating_tipo_dificuldade" class="label-base">Nível de Dificuldade</label>
+          <label for="floating_nivel_dificuldade" class="label-base">Grau de dificuldade</label>
         </div>
       </div>
     </div>
@@ -116,41 +138,41 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
+import { UserService } from '@/services/userService';
 
 export default defineComponent({
   props: {
     tarefatask: Object as () => TarefaTypes | null,
   },
+
   setup(props, { emit }) {
+    const users = ref<{ id: number; name: string }[]>([]); // Array para armazenar os usuários
+
+    const fetchUsers = async () => {
+      try {
+        const response = await UserService.getAllUsers((message) => {
+          console.log('const response do user ', response);
+          console.error(message); // Lidar com o erro
+        });
+        users.value = response;
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+      }
+    };
+
+    // Chama a função para buscar usuários quando o componente é montado
+    fetchUsers();
+
     const form = ref<TarefaTypes>({
       tarefa: '',
       descricao: '',
       responsavel: '',
       tipo_desenvolvimento: 'backend',
       nivel_dificuldade: 'facil',
-      status: '',
+      status: 'Aberta',
       concluida: false,
+      conclusao_em: '',
     });
-
-    watch(
-      () => props.tarefatask,
-      (newTarefa) => {
-        if (newTarefa) {
-          form.value = { ...newTarefa };
-        }
-      },
-      { immediate: true },
-    );
-
-    const submitTask = () => {
-      emit('save-task', form.value);
-      resetForm();
-    };
-
-    const cancel = () => {
-      resetForm();
-      emit('close');
-    };
 
     const resetForm = () => {
       form.value = {
@@ -159,13 +181,38 @@ export default defineComponent({
         responsavel: '',
         tipo_desenvolvimento: 'backend',
         nivel_dificuldade: 'facil',
-        status: '',
+        status: 'Aberta',
         concluida: false,
+        conclusao_em: '',
       };
+    };
+
+    // Watcher para atualizar o formulário ao receber nova tarefa
+    watch(
+      () => props.tarefatask,
+      (newTarefa) => {
+        if (newTarefa) {
+          form.value = { ...newTarefa }; // Carrega dados da tarefa para o formulário
+        } else {
+          resetForm(); // Reseta o formulário se não houver tarefa
+        }
+      },
+      { immediate: true },
+    );
+
+    const submitTask = () => {
+      emit('save-task', form.value);
+      resetForm(); // Reseta o formulário após salvar
+    };
+
+    const cancel = () => {
+      resetForm(); // Reseta o formulário ao cancelar
+      emit('close'); // Emite evento de fechar
     };
 
     return {
       form,
+      users,
       submitTask,
       cancel,
     };

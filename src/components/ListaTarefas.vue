@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/no-parsing-error -->
-<!-- eslint-disable vue/no-unused-components -->
 <template>
   <div class="text-right mr-4 mb-4">
     <button
@@ -9,63 +7,60 @@
       <span class="text-white">Cadastrar tarefa </span>
     </button>
   </div>
-  <!-- Formulário para cadastrar ou editar tarefas -->
-  <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
-      <FormularioTarefa @close="closeFormTarefa" />
-    >
-  </modalcomponent_>
-  <div>
-    <table class="min-w-full border-collapse border border-gray-200 p-4">
-      <thead class="bg-gray-600 text-white p-3">
-        <tr>
-          <th>#</th>
-          <th>Tarefa</th>
-          <th>Responsável</th>
-          <th>Conclusão em</th>
-          <th>Status</th>
-          <th class="text-right px-8 py-2">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-if="tarefas && tarefas.length">
-          <RowStatusComponent
-            v-for="(tarefa, index) in tarefas"
-            :key="`${tarefa.id}-${index}`"
-            :status="tarefa.status"
-          >
-            <td>{{ tarefa.id }}</td>
-            <td>{{ tarefa.tarefa }}</td>
-            <td>{{ tarefa.responsavel }}</td>
-            <td>{{ tarefa.conclusao_em }}</td>
-            <td>{{ tarefa.status }}</td>
-            <td class="text-right px-6 py-2">
-              <ButtonActionComponent
-                @edit="tarefaEditar(tarefa)"
-                @delete="tarefaExcluir(tarefa)"
-                @list="tarefaListar(tarefa)"
-              />
-            </td>
-          </RowStatusComponent>
-        </template>
-        <tr v-else>
-          <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">
-            Nenhuma tarefa disponível
-          </td>
-        </tr>
-      </tbody>
-    </table>
 
-    <SnackbarComponent
-      :show="snackbarVisible"
-      :message="snackbarMessage"
-      @close="snackbarVisible = false"
-      type="error"
-    />
-  </div>
+  <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
+    <FormularioTarefa :tarefatask="selectedTarefa" @save-task="saveTarefa" @close="closeFormTarefa" />
+  </modalcomponent_>
+
+  <table class="min-w-full border-collapse border border-gray-200 p-4">
+    <thead class="bg-gray-600 text-white p-3">
+      <tr>
+        <th>#</th>
+        <th>Tarefa</th>
+        <th>Responsável</th>
+        <th>Conclusão em</th>
+        <th>Status</th>
+        <th class="text-right px-8 py-2">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template v-if="tarefas && tarefas.length">
+        <RowStatusComponent
+          v-for="(tarefa, index) in tarefas"
+          :key="`${tarefa.id}-${index}`"
+          :status="tarefa.status"
+        >
+          <td>{{ tarefa.id }}</td>
+          <td>{{ tarefa.tarefa }}</td>
+          <td>{{ tarefa.responsavel }}</td>
+          <td>{{ tarefa.conclusao_em }}</td>
+          <td>{{ tarefa.status }}</td>
+          <td class="text-right px-6 py-2">
+            <ButtonActionComponent
+              @edit="tarefaEditar(tarefa)"
+              @delete="tarefaExcluir(tarefa)"
+            />
+          </td>
+        </RowStatusComponent>
+      </template>
+      <tr v-else>
+        <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">
+          Nenhuma tarefa disponível
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <SnackbarComponent
+    :show="snackbarVisible"
+    :message="snackbarMessage"
+    @close="snackbarVisible = false"
+    type="error"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
 import { TarefaService } from '../services/tarefaService';
 import SnackbarComponent from './../components/SnackbarComponent.vue';
@@ -81,21 +76,14 @@ export default defineComponent({
     RowStatusComponent,
     ButtonActionComponent,
     FormularioTarefa,
-    modalcomponent_
+    modalcomponent_,
   },
-  props: {
-    listTarefas: {
-      type: (Array as PropType<TarefaTypes[]>) || [],
-      required: true,
-    },
-  },
-  emits: ['edit-tarefa', 'delete-tarefa', 'update-tarefa'],
-  setup(props, { emit }) {
+  setup() {
     const snackbarVisible = ref(false);
     const snackbarMessage = ref('');
-    const tarefas = ref<TarefaTypes[]>(props.listTarefas);
+    const tarefas = ref<TarefaTypes[]>([]);
     const isFormVisible = ref(false);
-    const selectedTarefa = ref<TarefaTypes | null>(null); // Adicione esta linha
+    const selectedTarefa = ref<TarefaTypes | null>(null);
 
     const showSnackbar = (message: string) => {
       snackbarMessage.value = message;
@@ -106,67 +94,49 @@ export default defineComponent({
       try {
         const response = await TarefaService.getAllTarefas(showSnackbar);
         tarefas.value = Array.isArray(response) ? response : [response];
-        emit('update-tarefa', tarefas.value);
       } catch (error) {
         console.error('Erro ao buscar tarefas:', error);
       }
     };
 
     const tarefaEditar = (tarefa: TarefaTypes) => {
-      selectedTarefa.value = tarefa; // Define a tarefa selecionada para edição
-      isFormVisible.value = true; // Mostra o formulário
-      emit('edit-tarefa', tarefa);
-    };
-
-    const tarefaListar = (tarefa: TarefaTypes) => {
-      console.log('Consultando tarefa:', tarefa);
-    };
-
-    const tarefaConcluir = (tarefa: TarefaTypes) => {
-      // Lógica para concluir a tarefa
-      showSnackbar(`Tarefa # ${tarefa.id} ${tarefa.tarefa} concluída!`);
-    };
-
-    const tarefaExcluir = (tarefa: TarefaTypes) => {
-      // Lógica para deletar a tarefa
-      showSnackbar(`Tarefa # ${tarefa.id} - ${tarefa.tarefa} excluída!`);
-      // Aqui você pode implementar a chamada de serviço para deletar a tarefa
+      selectedTarefa.value = { ...tarefa };
+      isFormVisible.value = true;
     };
 
     const openFormTarefa = () => {
-      console.log("open formulario ");
+      selectedTarefa.value = null;
       isFormVisible.value = true;
-      selectedTarefa.value = null; // Limpa a seleção para uma nova tarefa
     };
 
     const saveTarefa = async (tarefa: TarefaTypes) => {
       try {
-        if (selectedTarefa.value) {
-          if (selectedTarefa.value.id !== undefined) {
-            await TarefaService.updateTarefa(
-              selectedTarefa.value.id,
-              tarefa,
-              showSnackbar,
-            );
-            showSnackbar(`Tarefa # ${tarefa.id} atualizada!`);
-          }
-          // Atualiza a tarefa existente
+        if (selectedTarefa.value && selectedTarefa.value.id !== undefined) {
+          await TarefaService.updateTarefa(
+            selectedTarefa.value.id,
+            tarefa,
+            showSnackbar,
+          );
+          showSnackbar(`Tarefa # ${tarefa.id} atualizada!`);
         } else {
-          // Cria uma nova tarefa
           await TarefaService.createTarefa(tarefa, showSnackbar);
           showSnackbar(`Tarefa # ${tarefa.tarefa} cadastrada!`);
         }
-        await listaTarefa(); // Atualiza a lista de tarefas
-        isFormVisible.value = false; // Fecha o formulário
+        await listaTarefa();
+        isFormVisible.value = false;
       } catch (error) {
-        console.error('Erro ao salvar a tarefa:', error);
         showSnackbar('Erro ao salvar a tarefa!');
       }
+    };
+
+    const tarefaExcluir = (tarefa: TarefaTypes) => {
+      showSnackbar(`Tarefa # ${tarefa.id} - ${tarefa.tarefa} excluída!`);
     };
 
     const closeFormTarefa = () => {
       isFormVisible.value = false;
     };
+
     onMounted(() => {
       listaTarefa();
     });
@@ -177,9 +147,7 @@ export default defineComponent({
       snackbarMessage,
       showSnackbar,
       tarefaEditar,
-      tarefaConcluir,
       tarefaExcluir,
-      tarefaListar,
       openFormTarefa,
       isFormVisible,
       selectedTarefa,
@@ -189,7 +157,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-/* Adicione seus estilos aqui se necessário */
-</style>
