@@ -1,12 +1,34 @@
 <template>
-  <div>
-    <h1>Login</h1>
-    <form @submit.prevent="login">
-      <input v-model="form.email" type="email" placeholder="Email" required />
-      <input v-model="form.password" type="password" placeholder="Password" required />
-      <button type="submit" :disabled="loading">Login</button>
+  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <h1 class="text-3xl font-bold mb-6">Login</h1>
+    <form @submit.prevent="login" class="bg-white p-6 rounded shadow-md w-96">
+      <div class="mb-4">
+        <input 
+          v-model="form.email" 
+          type="email" 
+          placeholder="Email" 
+          required 
+          class="border border-gray-300 p-2 rounded w-full"
+        />
+      </div>
+      <div class="mb-4">
+        <input 
+          v-model="form.password" 
+          type="password" 
+          placeholder="Password" 
+          required 
+          class="border border-gray-300 p-2 rounded w-full"
+        />
+      </div>
+      <button 
+        type="submit" 
+        :disabled="loading" 
+        class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200"
+      >
+        Login
+      </button>
     </form>
-    <div v-if="errorMessage">{{ errorMessage }}</div>
+    <div v-if="errorMessage" class="mt-4 text-red-500">{{ errorMessage }}</div>
   </div>
 </template>
 
@@ -20,7 +42,6 @@ export default {
   setup() {
     const router = useRouter();
     
-    // Definindo as reativas
     const form = ref<LoginCredentials>({
       email: '',
       password: ''
@@ -28,23 +49,22 @@ export default {
     const loading = ref(false);
     const errorMessage = ref<string | null>(null);
 
-    // Função de login
     const login = async () => {
       loading.value = true;
       errorMessage.value = null;
 
       try {
         const data = await authService.login(form.value);
-        localStorage.setItem('auth_token', data.token); // Use a mesma chave para o token
-        router.push('/'); // Redireciona após o login
+        console.log('Login bem-sucedido:', data); // Adicione esta linha
+        localStorage.setItem('auth_token', data.token);
+        router.push('/');
       } catch (error) {
-        errorMessage.value = (error as Error).message; // Captura a mensagem de erro
+        errorMessage.value = (error as Error).message;
       } finally {
         loading.value = false;
       }
     };
 
-    // Retornando os dados e métodos que serão utilizados no template
     return {
       form,
       loading,

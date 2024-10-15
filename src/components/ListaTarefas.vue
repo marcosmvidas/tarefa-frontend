@@ -1,5 +1,5 @@
 <template>
-<div>
+  <div>
     <h1>Gerenciar Tarefas</h1>
     <p>Você é um: {{ userRole }}</p>
     </div>
@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
 import { TarefaService } from '../services/tarefaService';
 import SnackbarComponent from './../components/SnackbarComponent.vue';
@@ -72,10 +72,11 @@ import RowStatusComponent from './StatusBadgeComponent.vue';
 import ButtonActionComponent from './ButtonActionComponent.vue';
 import FormularioTarefa from './FormularioTarefa.vue';
 import modalcomponent_ from './_ModalComponent.vue';
-import { authService } from '@/services/authService';
+import { useUserRole } from './../composables/useUserRole';
 
 export default defineComponent({
   name: 'ListaTarefas',
+
   components: {
     SnackbarComponent,
     RowStatusComponent,
@@ -83,18 +84,15 @@ export default defineComponent({
     FormularioTarefa,
     modalcomponent_,
   },
+  
   setup() {
     const snackbarVisible = ref(false);
     const snackbarMessage = ref('');
     const tarefas = ref<TarefaTypes[]>([]);
     const isFormVisible = ref(false);
     const selectedTarefa = ref<TarefaTypes | null>(null);
-    const roleId = ref(authService.getRoleId());
+    const { userRole } = useUserRole();
 
-
-    const userRole = computed(() => {
-      return roleId.value === 1 ? 'Gestor' : 'Usuário Comum';
-    });
     const showSnackbar = (message: string) => {
       snackbarMessage.value = message;
       snackbarVisible.value = true;
