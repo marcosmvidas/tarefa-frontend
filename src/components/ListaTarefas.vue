@@ -2,8 +2,8 @@
   <div>
     <h1>Gerenciar Tarefas</h1>
     <p>Você é um: {{ userRole }}</p>
-    </div>
-    <div class="text-right mr-4 mb-4">
+  </div>
+  <div class="text-right mr-4 mb-4">
     <button
       class="bg-green-500 rounded-lg cursor-pointer px-4"
       @click="openFormTarefa"
@@ -13,7 +13,11 @@
   </div>
 
   <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
-    <FormularioTarefa :tarefatask="selectedTarefa" @save-task="saveTarefa" @close="closeFormTarefa" />
+    <FormularioTarefa
+      :tarefatask="selectedTarefa"
+      @save-task="saveTarefa"
+      @close="closeFormTarefa"
+    />
   </modalcomponent_>
 
   <table class="min-w-full border-collapse border border-gray-200 p-4">
@@ -36,7 +40,12 @@
         >
           <td>{{ tarefa.id }}</td>
           <td>{{ tarefa.tarefa }}</td>
-          <td>{{ tarefa.responsavel }}</td>
+          <td>
+            <span v-if="tarefa.nome_responsavel">
+              {{ tarefa.nome_responsavel }}
+            </span>
+            <span v-else> Não atribuído </span>
+          </td>
           <td>{{ tarefa.conclusao_em }}</td>
           <td>{{ tarefa.status }}</td>
           <td class="text-right px-6 py-2">
@@ -84,7 +93,7 @@ export default defineComponent({
     FormularioTarefa,
     modalcomponent_,
   },
-  
+
   setup() {
     const snackbarVisible = ref(false);
     const snackbarMessage = ref('');
@@ -101,7 +110,17 @@ export default defineComponent({
     const listaTarefa = async () => {
       try {
         const response = await TarefaService.getAllTarefas(showSnackbar);
-        tarefas.value = Array.isArray(response) ? response : [response];
+
+        tarefas.value = response.map((tarefa) => ({
+          ...tarefa,
+          nome_responsavel:
+            typeof tarefa.nome_responsavel === 'object' &&
+            tarefa.nome_responsavel !== null
+              ? tarefa.nome_responsavel.name // Se for objeto, pega o 'name'
+              : tarefa.nome_responsavel, // Se for string, mantém como está
+        }));
+
+        console.log(response);
       } catch (error) {
         showSnackbar(`Tarefa ao listar as tarefas!`);
       }
@@ -113,7 +132,17 @@ export default defineComponent({
     };
 
     const openFormTarefa = () => {
-      selectedTarefa.value = null;
+      selectedTarefa.value = {
+        tarefa: '',
+        descricao: '',
+        responsavel: '',
+        tipo_desenvolvimento: '',
+        nivel_dificuldade: '',
+        status: '',
+        conclusao_em: '',
+        concluida: false,
+        nome_responsavel: '',
+      };
       isFormVisible.value = true;
     };
 
@@ -161,7 +190,7 @@ export default defineComponent({
       selectedTarefa,
       saveTarefa,
       closeFormTarefa,
-      userRole
+      userRole,
     };
   },
 });
