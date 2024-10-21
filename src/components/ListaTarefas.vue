@@ -19,10 +19,14 @@
         @close="closeFormTarefa"
       />
     </modalcomponent_>
-
-    <div class="flex justify-between items-center mb-4">
-      <label for="limit">Tarefas por página:</label>
-      <select id="limit" v-model="perPage" @change="changePage(1)" class="ml-2">
+    <div class="flex justify-start items-center mb-4">
+      <label for="limit" class="mr-2">Tarefas por página</label>
+      <select 
+        id="limit" 
+        v-model="perPage" 
+        @change="changePage(1)" 
+        class="bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-600 focus:border-blue-500 ml-1 p-1"
+      >
         <option v-for="option in options" :key="option" :value="option">
           {{ option }}
         </option>
