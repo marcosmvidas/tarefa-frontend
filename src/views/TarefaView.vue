@@ -1,20 +1,18 @@
 <template>
   <div class="tarefa-view">
     <h1>Lista de Tarefas</h1>
-    <!-- Inclui o componente GerenciadorTarefas que gerencia todas as tarefas -->
-<ListaTarefas />
+    <ListaTarefas />
     <GerenciadorTarefas />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import ListaTarefas from '@/components/ListaTarefas.vue'
+import ListaTarefas from '@/components/ListaTarefas.vue';
 
 export default defineComponent({
-  
   components: {
-   ListaTarefas,
+    ListaTarefas,
   },
 });
 </script>

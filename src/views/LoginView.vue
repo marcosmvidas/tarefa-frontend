@@ -36,7 +36,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { authService } from '../services/authService';
-import { LoginCredentials } from '../types/AuthTypes'; // Certifique-se de que este tipo existe
+import { LoginCredentials } from '../types/AuthTypes';
 
 export default {
   setup() {
@@ -55,9 +55,9 @@ export default {
 
       try {
         const data = await authService.login(form.value);
-        console.log('Login bem-sucedido:', data); // Adicione esta linha
+        console.log('Login bem-sucedido:', data);
         localStorage.setItem('auth_token', data.token);
-        router.push('/');
+        router.push('/tarefa');
       } catch (error) {
         errorMessage.value = (error as Error).message;
       } finally {

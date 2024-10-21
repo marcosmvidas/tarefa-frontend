@@ -1,0 +1,18 @@
+$light-grey: #cccccc;
+$orange: #17487e;
+
+body {
+  background-color: $light-grey;
+}
+
+.button {
+  padding: 10px 15px;
+  background-color: $orange;
+  color: white;
+  border: none;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: darken($orange, 10%);
+  }
+}

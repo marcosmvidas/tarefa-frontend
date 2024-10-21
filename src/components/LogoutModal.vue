@@ -35,15 +35,16 @@ export default defineComponent({
   methods: {
     async handleLogout() {
       try {
-        await authService.logout(); // Chama o método de logout do authService
-        this.$router.push('/'); // Redireciona para a página de login
+        await authService.logout(); 
+        this.$emit('close');
+        this.$router.push('/'); 
       } catch (error) {
         console.error('Erro ao fazer logout:', error);
         alert('Erro ao fazer logout. Tente novamente.');
       }
     },
     cancelLogout() {
-      this.$emit('close'); // Emitir um evento para fechar o modal
+      this.$emit('close');
     },
   },
 });

@@ -176,7 +176,7 @@ export default defineComponent({
     const form = ref<TarefaTypes>({
       tarefa: '',
       descricao: '',
-      responsavel: '',
+      responsavel: 0,
       tipo_desenvolvimento: 'backend',
       nivel_dificuldade: 'facil',
       status: 'Aberta',
@@ -188,7 +188,7 @@ export default defineComponent({
       form.value = {
         tarefa: '',
         descricao: '',
-        responsavel: '',
+        responsavel: 0,
         tipo_desenvolvimento: 'backend',
         nivel_dificuldade: 'facil',
         status: 'Aberta',

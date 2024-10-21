@@ -1,16 +1,32 @@
 import { api } from '../config/api';
 import { TarefaTypes } from '../types/TarefaTypes';
+import { PaginationType } from '../types/PaginationTypes';
 
 export const TarefaService = {
   async getAllTarefas(
+    page: number,
+    value: number,
     showSnackBar: (message: string) => void,
-  ): Promise<TarefaTypes[]> {
+  ): Promise<{
+    data: TarefaTypes[];
+    paginacao: PaginationType;
+  }> {
     try {
-      const response = await api.get('tarefa');
-      return response.data;
+      const response = await api.get(`/tarefa?page=${page}&per_page=${value}`);
+      return {
+        data: response.data.data,
+        paginacao: {
+          currentPage: response.data.current_page,
+          total: response.data.last_page,
+          limit: response.data.total,
+          offset: 0,
+          tarefas: [],
+        },
+      };
     } catch (error) {
-      showSnackBar('Erro ao obter tarefas:');
-      throw new Error('Erro ao obter tarefas');
+      const errorMessage = (error as { message?: string }).message || 'Erro desconhecido';
+      showSnackBar('Erro ao obter tarefas');
+      throw new Error(`Erro ao obter tarefas: ${errorMessage || error}`);
     }
   },
 
@@ -36,8 +52,9 @@ export const TarefaService = {
       const response = await api.put(`/tarefa/${id}`, tarefa);
       return response.data;
     } catch (error) {
+      const errorMessage = (error as { message?: string }).message || 'Erro desconhecido';
       showSnackBar(`Erro ao atualizar tarefa com ID ${id}`);
-      throw new Error(`Erro ao atualizar tarefa com ID ${id}`);
+      throw new Error(`Erro ao atualizar tarefa com ID ${id}: ${errorMessage || error}`);
     }
   },
 
@@ -48,8 +65,9 @@ export const TarefaService = {
     try {
       await api.delete(`/tarefa/${id}`);
     } catch (error) {
-      showSnackBar(`Erro ao deletar tarefa com ID ${id}:`);
-      throw new Error(`Erro ao deletar tarefa com ID ${id}`);
+      const errorMessage = (error as { message?: string }).message || 'Erro desconhecido';
+      showSnackBar(`Erro ao deletar tarefa com ID ${id}`);
+      throw new Error(`Erro ao deletar tarefa com ID ${id}: ${errorMessage || error}`);
     }
   },
 
@@ -58,8 +76,9 @@ export const TarefaService = {
       const response = await api.get('/tarefas/form-structure');
       return response.data;
     } catch (error) {
+      const errorMessage = (error as { message?: string }).message || 'Erro desconhecido';
       showSnackBar('Erro ao obter a estrutura do formulário');
-      throw new Error('Erro ao obter a estrutura do formulário');
+      throw new Error(`Erro ao obter a estrutura do formulário: ${errorMessage || error}`);
     }
   }
 };

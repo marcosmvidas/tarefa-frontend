@@ -7,7 +7,7 @@ export interface TarefaTypes {
   id?: number;
   tarefa: string;
   descricao: string;
-  responsavel: string; // Isso pode ser o ID do responsável
+  responsavel: number;
   tipo_desenvolvimento: string;
   nivel_dificuldade: string;
   status: string;

@@ -2,74 +2,92 @@
   <div>
     <h1>Gerenciar Tarefas</h1>
     <p>Você é um: {{ userRole }}</p>
-  </div>
-  <div class="text-right mr-4 mb-4">
-    <button
-      class="bg-green-500 rounded-lg cursor-pointer px-4"
-      @click="openFormTarefa"
-    >
-      <span class="text-white">Cadastrar tarefa </span>
-    </button>
-  </div>
 
-  <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
-    <FormularioTarefa
-      :tarefatask="selectedTarefa"
-      @save-task="saveTarefa"
-      @close="closeFormTarefa"
+    <div class="text-right mr-4 mb-4">
+      <button
+        class="bg-green-500 rounded-lg cursor-pointer px-4"
+        @click="openFormTarefa"
+      >
+        <span class="text-white">Cadastrar tarefa</span>
+      </button>
+    </div>
+
+    <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
+      <FormularioTarefa
+        :tarefatask="selectedTarefa"
+        @save-task="saveTarefa"
+        @close="closeFormTarefa"
+      />
+    </modalcomponent_>
+
+    <div class="flex justify-between items-center mb-4">
+      <label for="limit">Tarefas por página:</label>
+      <select id="limit" v-model="perPage" @change="changePage(1)" class="ml-2">
+        <option v-for="option in options" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+
+    <table class="min-w-full border-collapse border border-gray-200 p-4">
+      <thead class="bg-gray-600 text-white p-3">
+        <tr>
+          <th>#</th>
+          <th>Tarefa</th>
+          <th>Responsável</th>
+          <th>Conclusão em</th>
+          <th>Status</th>
+          <th class="text-right px-8 py-2">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-if="tarefas && tarefas.length">
+          <RowStatusComponent
+            v-for="(tarefa, index) in tarefas"
+            :key="`${tarefa.id}-${index}`"
+            :status="tarefa.status"
+          >
+            <td>{{ tarefa.id }}</td>
+            <td>{{ tarefa.tarefa }}</td>
+            <td>{{ tarefa.nome_responsavel }}</td>
+            <td>
+              <span v-if="tarefa.nome_responsavel">
+                {{ tarefa.nome_responsavel }}
+              </span>
+              <span v-else> Não atribuído </span>
+            </td>
+            <td>{{ tarefa.conclusao_em }}</td>
+            <td>{{ tarefa.status }}</td>
+            <td class="text-right px-6 py-2">
+              <ButtonActionComponent
+                @edit="tarefaEditar(tarefa)"
+                @delete="tarefaExcluir(tarefa)"
+              />
+            </td>
+          </RowStatusComponent>
+        </template>
+        <tr v-else>
+          <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">
+            Nenhuma tarefa disponível
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <PaginationComponent
+      :offset="page"
+      :total="totalTarefas"
+      :limit="perPage"
+      @change-page="changePage"
     />
-  </modalcomponent_>
 
-  <table class="min-w-full border-collapse border border-gray-200 p-4">
-    <thead class="bg-gray-600 text-white p-3">
-      <tr>
-        <th>#</th>
-        <th>Tarefa</th>
-        <th>Responsável</th>
-        <th>Conclusão em</th>
-        <th>Status</th>
-        <th class="text-right px-8 py-2">Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <template v-if="tarefas && tarefas.length">
-        <RowStatusComponent
-          v-for="(tarefa, index) in tarefas"
-          :key="`${tarefa.id}-${index}`"
-          :status="tarefa.status"
-        >
-          <td>{{ tarefa.id }}</td>
-          <td>{{ tarefa.tarefa }}</td>
-          <td>
-            <span v-if="tarefa.nome_responsavel">
-              {{ tarefa.nome_responsavel }}
-            </span>
-            <span v-else> Não atribuído </span>
-          </td>
-          <td>{{ tarefa.conclusao_em }}</td>
-          <td>{{ tarefa.status }}</td>
-          <td class="text-right px-6 py-2">
-            <ButtonActionComponent
-              @edit="tarefaEditar(tarefa)"
-              @delete="tarefaExcluir(tarefa)"
-            />
-          </td>
-        </RowStatusComponent>
-      </template>
-      <tr v-else>
-        <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">
-          Nenhuma tarefa disponível
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <SnackbarComponent
-    :show="snackbarVisible"
-    :message="snackbarMessage"
-    @close="snackbarVisible = false"
-    type="error"
-  />
+    <SnackbarComponent
+      :show="snackbarVisible"
+      :message="snackbarMessage"
+      @close="snackbarVisible = false"
+      type="error"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -81,6 +99,7 @@ import RowStatusComponent from './StatusBadgeComponent.vue';
 import ButtonActionComponent from './ButtonActionComponent.vue';
 import FormularioTarefa from './FormularioTarefa.vue';
 import modalcomponent_ from './_ModalComponent.vue';
+import PaginationComponent from './PaginationComponent.vue'; // Certifique-se de importar o componente de paginação
 import { useUserRole } from './../composables/useUserRole';
 
 export default defineComponent({
@@ -92,6 +111,7 @@ export default defineComponent({
     ButtonActionComponent,
     FormularioTarefa,
     modalcomponent_,
+    PaginationComponent,
   },
 
   setup() {
@@ -102,6 +122,11 @@ export default defineComponent({
     const selectedTarefa = ref<TarefaTypes | null>(null);
     const { userRole } = useUserRole();
 
+    const page = ref(1);
+    const totalTarefas = ref(0);
+    const perPage = ref(10);
+    const options = [5, 10, 15, 20];
+
     const showSnackbar = (message: string) => {
       snackbarMessage.value = message;
       snackbarVisible.value = true;
@@ -109,21 +134,34 @@ export default defineComponent({
 
     const listaTarefa = async () => {
       try {
-        const response = await TarefaService.getAllTarefas(showSnackbar);
+        const { data, paginacao } = await TarefaService.getAllTarefas(
+          page.value,
+          perPage.value,
+          showSnackbar,
+        );
 
-        tarefas.value = response.map((tarefa) => ({
+        tarefas.value = data.map((tarefa) => ({
           ...tarefa,
           nome_responsavel:
-            typeof tarefa.nome_responsavel === 'object' &&
-            tarefa.nome_responsavel !== null
-              ? tarefa.nome_responsavel.name // Se for objeto, pega o 'name'
-              : tarefa.nome_responsavel, // Se for string, mantém como está
+            typeof tarefa.nome_responsavel === 'object' && 
+            tarefa.nome_responsavel !== null ?
+            tarefa.nome_responsavel.name
+            :
+            null,
         }));
 
-        console.log(response);
+        console.log('tarefas.value ', tarefas.value);
+        
+        totalTarefas.value = paginacao.limit;
+        console.log('paginacao ', paginacao);
       } catch (error) {
-        showSnackbar(`Tarefa ao listar as tarefas!`);
+        showSnackbar((error as Error).message || 'Erro ao listar tarefas');
       }
+    };
+
+    const changePage = (newPage: number) => {
+      page.value = newPage;
+      listaTarefa();
     };
 
     const tarefaEditar = (tarefa: TarefaTypes) => {
@@ -135,7 +173,7 @@ export default defineComponent({
       selectedTarefa.value = {
         tarefa: '',
         descricao: '',
-        responsavel: '',
+        responsavel: 0,
         tipo_desenvolvimento: '',
         nivel_dificuldade: '',
         status: '',
@@ -167,6 +205,7 @@ export default defineComponent({
     };
 
     const tarefaExcluir = (tarefa: TarefaTypes) => {
+      // Lógica para excluir a tarefa (se necessário implementar a exclusão)
       showSnackbar(`Tarefa # ${tarefa.id} - ${tarefa.tarefa} excluída!`);
     };
 
@@ -191,6 +230,11 @@ export default defineComponent({
       saveTarefa,
       closeFormTarefa,
       userRole,
+      page,
+      totalTarefas,
+      changePage,
+      perPage,
+      options,
     };
   },
 });
