@@ -6,7 +6,7 @@
       @click="changePage(current - 1)"
       aria-label="Previous Page"
     >
-      <ChevronLeftIcon />
+      <ChevronLeftIcon class="h-6"/>
     </button>
 
     <button
@@ -25,9 +25,12 @@
       @click="changePage(current + 1)"
       aria-label="Next Page"
     >
-      <ChevronRightIcon />
+      <ChevronRightIcon class="h-6"/>
     </button>
   </div>
+  <p>
+    Total de registros {{ total }}
+  </p>
 </template>
 
 <script lang="ts">
@@ -68,7 +71,6 @@ export default defineComponent({
       for (let i = 1; i <= this.totalPages; i++) {
         pagesArray.push(i);
       }
-      // Exibe até 5 páginas ao redor da página atual
       const startPage = Math.max(this.current - 2, 1);
       const endPage = Math.min(this.current + 2, this.totalPages);
       return pagesArray.slice(startPage - 1, endPage); // -1 para ajustar índice

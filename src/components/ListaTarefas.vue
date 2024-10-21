@@ -49,7 +49,6 @@
           >
             <td>{{ tarefa.id }}</td>
             <td>{{ tarefa.tarefa }}</td>
-            <td>{{ tarefa.nome_responsavel }}</td>
             <td>
               <span v-if="tarefa.nome_responsavel">
                 {{ tarefa.nome_responsavel }}
