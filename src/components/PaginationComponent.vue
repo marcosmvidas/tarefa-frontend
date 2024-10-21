@@ -1,38 +1,44 @@
 <template>
-  <div class="flex justify-center space-x-2 my-4">
-    <button
-      :disabled="current === 1"
-      class="item prev px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-l"
-      @click="changePage(current - 1)"
-      aria-label="Previous Page"
-    >
-      <ChevronLeftIcon class="h-6"/>
-    </button>
+  <div class="flex justify-between items-center my-4">
+    <span class="text-left">
+      Registro {{ showingStart }} ao {{ showingEnd }}
+    </span>
 
-    <button
-      v-for="page in pages"
-      :key="page"
-      :class="['item px-4 py-2', { 'bg-blue-500 text-white font-bold': page === current }]"
-      @click="changePage(page)"
-      :aria-label="'Page ' + page"
-    >
-      {{ page }}
-    </button>
+    <div class="flex justify-center space-x-2">
+      <button
+        :disabled="current === 1"
+        class="item prev px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
+        @click="changePage(current - 1)"
+        aria-label="Previous Page"
+      >
+        <ChevronLeftIcon class="h-6" />
+      </button>
 
-    <button
-      :disabled="current === totalPages"
-      class="item next px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-r"
-      @click="changePage(current + 1)"
-      aria-label="Next Page"
-    >
-      <ChevronRightIcon class="h-6"/>
-    </button>
+      <button
+        v-for="page in pages"
+        :key="page"
+        :class="[
+          'item px-4 py-2',
+          { 'bg-blue-500 text-white font-bold rounded-lg': page === current },
+        ]"
+        @click="changePage(page)"
+        :aria-label="'Page ' + page"
+      >
+        {{ page }}
+      </button>
+
+      <button
+        :disabled="current === totalPages"
+        class="item next px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
+        @click="changePage(current + 1)"
+        aria-label="Next Page"
+      >
+        <ChevronRightIcon class="h-6" />
+      </button>
+    </div>
+    <span class="text-right"> Total de {{ total }} </span>
   </div>
-  <p>
-    Total de registros {{ total }}
-  </p>
 </template>
-
 <script lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/16/solid';
 import { defineComponent } from 'vue';
@@ -73,7 +79,13 @@ export default defineComponent({
       }
       const startPage = Math.max(this.current - 2, 1);
       const endPage = Math.min(this.current + 2, this.totalPages);
-      return pagesArray.slice(startPage - 1, endPage); // -1 para ajustar índice
+      return pagesArray.slice(startPage - 1, endPage);
+    },
+    showingStart(): number {
+      return (this.current - 1) * this.limit + 1;
+    },
+    showingEnd(): number {
+      return Math.min(this.current * this.limit, this.total);
     },
   },
 

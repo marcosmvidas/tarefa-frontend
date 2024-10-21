@@ -2,14 +2,79 @@
   <div>
     <h1>Gerenciar Tarefas</h1>
     <p>Você é um: {{ userRole }}</p>
-
-    <div class="text-right mr-4 mb-4">
-      <button
-        class="bg-green-500 rounded-lg cursor-pointer px-4"
-        @click="openFormTarefa"
+    <div class="flex justify-between items-center mb-4 w-full">
+      <div
+        class="flex flex-col md:flex-row justify-start items-center w-full md:w-auto"
       >
-        <span class="text-white">Cadastrar tarefa</span>
-      </button>
+        <label for="limit" class="mr-2 mb-2 md:mb-0">Tarefas por página</label>
+        <select
+          id="limit"
+          v-model="perPage"
+          @change="changePage(1)"
+          class="bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-600 focus:border-blue-500 p-1 w-full md:w-auto"
+        >
+          <option v-for="option in options" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <div class="text-right">
+        <button
+          class="bg-green-500 rounded-lg cursor-pointer shadow-sm p-1 hover:bg-blue-500"
+          @click="openFormTarefa"
+        >
+          <span class="text-white hover:font-semibold p-2">Cadastrar tarefa</span>
+        </button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-collapse border border-gray-200 p-4">
+        <thead class="bg-gray-600 text-white p-3">
+          <tr>
+            <th>#</th>
+            <th>Tarefa</th>
+            <th>Responsável</th>
+            <th>Conclusão em</th>
+            <th>Status</th>
+            <th class="text-right px-8 py-2">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-if="tarefas && tarefas.length">
+            <RowStatusComponent
+              v-for="(tarefa, index) in tarefas"
+              :key="`${tarefa.id}-${index}`"
+              :status="tarefa.status"
+            >
+              <td>{{ tarefa.id }}</td>
+              <td>{{ tarefa.tarefa }}</td>
+              <td>
+                <span v-if="tarefa.nome_responsavel">
+                  {{ tarefa.nome_responsavel }}
+                </span>
+                <span v-else> Não atribuído </span>
+              </td>
+              <td>{{ tarefa.conclusao_em }}</td>
+              <td>{{ tarefa.status }}</td>
+              <td class="text-right px-6 py-2">
+                <ButtonActionComponent
+                  @edit="tarefaEditar(tarefa)"
+                  @delete="tarefaExcluir(tarefa)"
+                />
+              </td>
+            </RowStatusComponent>
+          </template>
+          <tr v-else>
+            <td
+              colspan="6"
+              class="border border-gray-300 px-4 py-2 text-center"
+            >
+              Nenhuma tarefa disponível
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <modalcomponent_ :isVisible="isFormVisible" @close="closeFormTarefa">
@@ -19,63 +84,6 @@
         @close="closeFormTarefa"
       />
     </modalcomponent_>
-    <div class="flex justify-start items-center mb-4">
-      <label for="limit" class="mr-2">Tarefas por página</label>
-      <select 
-        id="limit" 
-        v-model="perPage" 
-        @change="changePage(1)" 
-        class="bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-600 focus:border-blue-500 ml-1 p-1"
-      >
-        <option v-for="option in options" :key="option" :value="option">
-          {{ option }}
-        </option>
-      </select>
-    </div>
-
-    <table class="min-w-full border-collapse border border-gray-200 p-4">
-      <thead class="bg-gray-600 text-white p-3">
-        <tr>
-          <th>#</th>
-          <th>Tarefa</th>
-          <th>Responsável</th>
-          <th>Conclusão em</th>
-          <th>Status</th>
-          <th class="text-right px-8 py-2">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-if="tarefas && tarefas.length">
-          <RowStatusComponent
-            v-for="(tarefa, index) in tarefas"
-            :key="`${tarefa.id}-${index}`"
-            :status="tarefa.status"
-          >
-            <td>{{ tarefa.id }}</td>
-            <td>{{ tarefa.tarefa }}</td>
-            <td>
-              <span v-if="tarefa.nome_responsavel">
-                {{ tarefa.nome_responsavel }}
-              </span>
-              <span v-else> Não atribuído </span>
-            </td>
-            <td>{{ tarefa.conclusao_em }}</td>
-            <td>{{ tarefa.status }}</td>
-            <td class="text-right px-6 py-2">
-              <ButtonActionComponent
-                @edit="tarefaEditar(tarefa)"
-                @delete="tarefaExcluir(tarefa)"
-              />
-            </td>
-          </RowStatusComponent>
-        </template>
-        <tr v-else>
-          <td colspan="6" class="border border-gray-300 px-4 py-2 text-center">
-            Nenhuma tarefa disponível
-          </td>
-        </tr>
-      </tbody>
-    </table>
 
     <PaginationComponent
       :offset="page"
@@ -128,7 +136,7 @@ export default defineComponent({
     const page = ref(1);
     const totalTarefas = ref(0);
     const perPage = ref(10);
-    const options = [5, 10, 15, 20];
+    const options = [5, 10, 15, 20, 50, 100];
 
     const showSnackbar = (message: string) => {
       snackbarMessage.value = message;
@@ -146,15 +154,14 @@ export default defineComponent({
         tarefas.value = data.map((tarefa) => ({
           ...tarefa,
           nome_responsavel:
-            typeof tarefa.nome_responsavel === 'object' && 
-            tarefa.nome_responsavel !== null ?
-            tarefa.nome_responsavel.name
-            :
-            null,
+            typeof tarefa.nome_responsavel === 'object' &&
+            tarefa.nome_responsavel !== null
+              ? tarefa.nome_responsavel.name
+              : null,
         }));
 
         console.log('tarefas.value ', tarefas.value);
-        
+
         totalTarefas.value = paginacao.limit;
         console.log('paginacao ', paginacao);
       } catch (error) {
