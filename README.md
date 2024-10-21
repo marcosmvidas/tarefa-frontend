@@ -29,7 +29,7 @@ yarn lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-# eSocial Brasil - Frontend
+# gestão de tarefas - Frontend
 
 Este repositório contém a interface frontend do projeto eSocial Brasil, desenvolvida em Vue.js. A aplicação é responsável por interagir com a API backend e fornecer uma experiência de usuário moderna.
 
