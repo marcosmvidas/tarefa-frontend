@@ -1,18 +1,23 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div class="flex">
+    <SideBarComponent />
+    <main class="flex-1 p-4">
+      <router-view /> <!-- Aqui será exibido TarefaView quando navegar para /home/tarefa -->
+    </main>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import { defineComponent } from 'vue';
+import SideBarComponent from './../components/Sidebar.vue';
 
-@Options({
+export default defineComponent({
   components: {
-    HelloWorld,
+    SideBarComponent,
   },
-})
-export default class HomeView extends Vue {}
+});
 </script>
+
+<style scoped>
+/* Estilos para o layout do HomeView, se necessário */
+</style>

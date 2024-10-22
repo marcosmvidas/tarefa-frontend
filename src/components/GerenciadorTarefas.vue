@@ -1,7 +1,6 @@
 <template>
-  <div>
+  <div class="gerenciaTarefa">
     <h2>Gerenciamento de Tarefas</h2>
-    <!-- Aqui pode ficar a lista de tarefas, o botão para adicionar e o form de edição -->
     <FormularioTarefa @salvar="salvarTarefa" />
   </div>
 </template>
@@ -44,7 +43,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-h2 {
-  margin-bottom: 20px;
+.gerenciaTarefa {
+  padding: 20px;
+  
 }
 </style>

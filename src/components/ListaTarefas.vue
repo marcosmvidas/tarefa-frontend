@@ -1,8 +1,9 @@
 <template>
   <div>
-    <h1>Gerenciar Tarefas</h1>
-    <p>Você é um: {{ userRole }}</p>
     <div class="flex justify-between items-center mb-4 w-full">
+      <h1>Gerenciar Tarefas</h1>
+    <p>Você é um: {{ userRole }}</p>
+    </div>    <div class="flex justify-between items-center mb-4 w-full">
       <div
         class="flex flex-col md:flex-row justify-start items-center w-full md:w-auto"
       >
@@ -215,7 +216,6 @@ export default defineComponent({
     };
 
     const tarefaExcluir = (tarefa: TarefaTypes) => {
-      // Lógica para excluir a tarefa (se necessário implementar a exclusão)
       showSnackbar(`Tarefa # ${tarefa.id} - ${tarefa.tarefa} excluída!`);
     };
 

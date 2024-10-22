@@ -1,37 +1,31 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import HomeView from '@/views/HomeView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/home',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    children: [
+      {
+        path: '/tarefa',
+        name: 'tarefa',
+        meta: { requireAuth: true },
+        component: () => import(/* webpackChunkName: "tarefa" */ '../views/TarefaView.vue'),
+      },
+    ],
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
-    meta: { requireAuth: true},
-  },
-  {
-    path: '/login',
+    path: '/',
     name: 'login',
-    component: () => import(/* webpackChunkName: "login" */ '../views/LoginView.vue')
+    component: () => import(/* webpackChunkName: "login" */ '../views/LoginView.vue'),
   },
-  {
-    path: '/tarefa',
-    name: 'tarefa',
-    component: () => import(/* webpackChunkName: "tarefa" */ '../views/TarefaView.vue')
-  }
-]
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
-})
+  routes,
+});
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('token'); // Verifica se o token está presente
@@ -44,5 +38,4 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-
-export default router
+export default router;

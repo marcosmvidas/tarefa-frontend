@@ -1,9 +1,9 @@
 <template>
-  <div class="tarefa-view">
-    <h1>Lista de Tarefas</h1>
-    <ListaTarefas />
-    <GerenciadorTarefas />
-  </div>
+  <main id="tarefa-create-page">
+    <div class="w-full h-[calc(100vh-full)] bg-gray-200 p-[20px]">
+      <ListaTarefas />
+    </div>
+  </main>
 </template>
 
 <script lang="ts">
@@ -17,13 +17,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.tarefa-view {
-  padding: 20px;
-}
-
-h1 {
-  margin-bottom: 20px;
-  font-size: 24px;
-}
-</style>
+<style scoped></style>
