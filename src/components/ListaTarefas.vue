@@ -142,17 +142,14 @@ export default defineComponent({
     const perPage = ref(10);
     const options = [5, 10, 15, 20, 50, 100];
 
-    const showSnackbar = (message: string, type: 'success' | 'error' = 'success') => {
-  snackbarMessage.value = message;
-  snackbarVisible.value = true;
-  snackbarType.value = type;
-};
-    // const showSnackbar = (message: string) => {
-    //   snackbarMessage.value = message;
-    //   snackbarVisible.value = true;
-    //   snackbarType.value = 'success';
-
-    // };
+    const showSnackbar = (
+      message: string,
+      type: 'success' | 'error' = 'success',
+    ) => {
+      snackbarMessage.value = message;
+      snackbarVisible.value = true;
+      snackbarType.value = type;
+    };
 
     const listaTarefa = async () => {
       try {

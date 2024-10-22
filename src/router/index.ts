@@ -13,6 +13,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requireAuth: true },
         component: () => import(/* webpackChunkName: "tarefa" */ '../views/TarefaView.vue'),
       },
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        meta: { requireAuth: true },
+        component: () => import(/* webpackChunkName: "dashbord" */ '../views/DashboardView.vue'),
+      },
     ],
   },
   {

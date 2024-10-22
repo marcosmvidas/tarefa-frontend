@@ -17,3 +17,10 @@ body {
     background-color: $green;
   }
 }
+
+.graph-container {
+  @apply bg-white p-6 shadow-md rounded-lg;
+}
+.page-container {
+  @apply flex flex-col items-center p-4;
+}
