@@ -171,6 +171,7 @@ import { defineComponent, ref, watch } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
 import { UserService } from '@/services/userService';
 import { authService } from '@/services/authService';
+import { formatDateShort } from '@/helpers/helpers';
 
 export default defineComponent({
   props: {
@@ -251,6 +252,7 @@ export default defineComponent({
       submitTask,
       cancel,
       isGestor,
+      formatDateShort,
     };
   },
 });

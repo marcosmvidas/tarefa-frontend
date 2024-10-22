@@ -1,3 +1,4 @@
+<!-- eslint-disable no-undef -->
 <template>
   <div>
     <div class="flex justify-between items-center mb-4 w-full">
@@ -29,10 +30,10 @@
       </div>
     </div>
     <div class="overflow-x-auto">
-      <table class="min-w-full border-collapse border border-gray-200 p-4">
-        <thead class="bg-gray-600 text-white p-3">
+      <table class="min-w-full border-collapse border border-gray-200">
+        <thead class="bg-gray-600 text-white text-left">
           <tr>
-            <th>#</th>
+            <th class="p-2">#</th>
             <th>Tarefa</th>
             <th>Responsável</th>
             <th>Conclusão em</th>
@@ -55,7 +56,7 @@
                 </span>
                 <span v-else> Não atribuído </span>
               </td>
-              <td>{{ tarefa.conclusao_em }}</td>
+              <td>{{ formatDateLong(tarefa.conclusao_em) }}</td>
               <td>{{ tarefa.status }}</td>
               <td class="text-right px-6 py-2">
                 <ButtonActionComponent
@@ -97,7 +98,7 @@
       :show="snackbarVisible"
       :message="snackbarMessage"
       @close="snackbarVisible = false"
-      type="error"
+      :type="snackbarType"
     />
   </div>
 </template>
@@ -111,8 +112,9 @@ import RowStatusComponent from './StatusBadgeComponent.vue';
 import ButtonActionComponent from './ButtonActionComponent.vue';
 import FormularioTarefa from './FormularioTarefa.vue';
 import modalcomponent_ from './_ModalComponent.vue';
-import PaginationComponent from './PaginationComponent.vue'; // Certifique-se de importar o componente de paginação
+import PaginationComponent from './PaginationComponent.vue';
 import { useUserRole } from './../composables/useUserRole';
+import { formatDateLong } from '@/helpers/helpers';
 
 export default defineComponent({
   name: 'ListaTarefas',
@@ -129,6 +131,7 @@ export default defineComponent({
   setup() {
     const snackbarVisible = ref(false);
     const snackbarMessage = ref('');
+    const snackbarType = ref('');
     const tarefas = ref<TarefaTypes[]>([]);
     const isFormVisible = ref(false);
     const selectedTarefa = ref<TarefaTypes | null>(null);
@@ -139,10 +142,17 @@ export default defineComponent({
     const perPage = ref(10);
     const options = [5, 10, 15, 20, 50, 100];
 
-    const showSnackbar = (message: string) => {
-      snackbarMessage.value = message;
-      snackbarVisible.value = true;
-    };
+    const showSnackbar = (message: string, type: 'success' | 'error' = 'success') => {
+  snackbarMessage.value = message;
+  snackbarVisible.value = true;
+  snackbarType.value = type;
+};
+    // const showSnackbar = (message: string) => {
+    //   snackbarMessage.value = message;
+    //   snackbarVisible.value = true;
+    //   snackbarType.value = 'success';
+
+    // };
 
     const listaTarefa = async () => {
       try {
@@ -162,7 +172,6 @@ export default defineComponent({
         }));
 
         totalTarefas.value = paginacao.limit;
-        console.log('paginacao ', paginacao);
       } catch (error) {
         showSnackbar((error as Error).message || 'Erro ao listar tarefas');
       }
@@ -201,7 +210,7 @@ export default defineComponent({
             tarefa,
             showSnackbar,
           );
-          showSnackbar(`Tarefa # ${tarefa.id} atualizada!`);
+          showSnackbar(`Tarefa # ${tarefa.id} atualizada!`, 'success');
         } else {
           await TarefaService.createTarefa(tarefa, showSnackbar);
           showSnackbar(`Tarefa # ${tarefa.tarefa} cadastrada!`);
@@ -209,7 +218,7 @@ export default defineComponent({
         await listaTarefa();
         isFormVisible.value = false;
       } catch (error) {
-        showSnackbar('Erro ao salvar a tarefa!');
+        showSnackbar('Erro ao salvar a tarefa!', 'error');
       }
     };
 
@@ -229,6 +238,7 @@ export default defineComponent({
       tarefas,
       snackbarVisible,
       snackbarMessage,
+      snackbarType,
       showSnackbar,
       tarefaEditar,
       tarefaExcluir,
@@ -243,6 +253,7 @@ export default defineComponent({
       changePage,
       perPage,
       options,
+      formatDateLong,
     };
   },
 });
