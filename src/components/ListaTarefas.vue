@@ -161,8 +161,6 @@ export default defineComponent({
               : null,
         }));
 
-        console.log('tarefas.value ', tarefas.value);
-
         totalTarefas.value = paginacao.limit;
         console.log('paginacao ', paginacao);
       } catch (error) {

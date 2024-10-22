@@ -1,17 +1,29 @@
 <template>
   <h2
-  class="p-6 font-bold"
-  :class="{
-    'text-blue-600 bg-blue-200'  : tarefatask && tarefatask.id,
-    'text-green-600 bg-green-200': !(tarefatask && tarefatask.id),
-  }"
->
-  <strong>{{ tarefatask && tarefatask.id ? 'ALTERAÇÃO' : 'CADASTRO' }}</strong>
-  <p :class="tarefatask && tarefatask.id ? 'text-blue-600' : 'text-green-600'">
-    {{ tarefatask && tarefatask.id ? 'Edição da tarefa' : 'Nova tarefa' }}
-  </p>
-</h2>
-
+    class="p-6 font-bold"
+    :class="{
+      'text-blue-600 bg-blue-200': tarefatask && tarefatask.id,
+      'text-green-600 bg-green-200': !(tarefatask && tarefatask.id),
+    }"
+  >
+    <strong>
+      {{
+        tarefatask && tarefatask.id
+          ? 'ALTERAÇÃO DA TAREFA'
+          : 'CADASTRO DA TAREFA'
+      }}</strong
+    >
+    <p
+      class="text-xs"
+      :class="tarefatask && tarefatask.id ? 'text-blue-600' : 'text-green-600'"
+    >
+      {{
+        tarefatask && tarefatask.id
+          ? 'Insira as alterçãoes no formulário'
+          : 'Insira as informações no formulário'
+      }}
+    </p>
+  </h2>
 
   <form @submit.prevent="submitTask">
     <div class="grid grid-cols-12 gap-8 p-12 mb-5">
@@ -101,7 +113,7 @@
         <div class="relative z-0 mb-5 group">
           <select v-model="form.responsavel" required class="input-base">
             <option value="" disabled selected>Selecione um responsável</option>
-            <option v-for="user in users" :key="user.id" :value="user.name">
+            <option v-for="user in users" :key="user.id" :value="user.id">
               {{ user.name }}
             </option>
           </select>
@@ -172,6 +184,7 @@ export default defineComponent({
     const fetchUsers = async () => {
       try {
         const response = await UserService.getAllUsers((message) => {
+          console.log('carrega as informações do usuario ', response);
           console.error(message);
         });
         users.value = response;
@@ -210,7 +223,7 @@ export default defineComponent({
       () => props.tarefatask,
       (newTarefa) => {
         if (newTarefa) {
-          form.value = { ...newTarefa };
+          form.value = { ...newTarefa, responsavel: newTarefa.responsavel };
         } else {
           resetForm();
         }
@@ -228,9 +241,8 @@ export default defineComponent({
       emit('close');
     };
 
-    // Determina se o usuário é um gestor (substitua pelo ID real do gestor, como 1)
     const isGestor = () => {
-      return roleId.value === 1; // Supondo que o role_id do gestor seja 1
+      return roleId.value === 1;
     };
 
     return {
@@ -238,7 +250,7 @@ export default defineComponent({
       users,
       submitTask,
       cancel,
-      isGestor, // Exponha a função
+      isGestor,
     };
   },
 });
