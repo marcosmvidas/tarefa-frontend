@@ -148,7 +148,7 @@ aside {
       display: flex;
       align-items: center;
       text-decoration: none;
-
+      background-color: var(--dark);
       transition: 0.2s ease-in-out;
       padding: 0.5rem 1rem;
 
@@ -172,19 +172,37 @@ aside {
       }
 
       &.router-link-exact-active {
-        background-color: var(--dark-alt);
-        border-right: 5px solid var(--primary);
+        background-color: var(--light);
+        border-right: 5px solid var(--light);
 
         .material-icons,
         .text {
-          color: var(--primary);
+          color: var(--dark-alt);
         }
       }
     }
   }
 
+  .footer {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    p {
+      font-size: 0.875rem;
+      color: var(--grey);
+    }
+  }
+
   &.sideBar {
     width: var(--sidebar-width);
+
+    .menu-toggle-wrap {
+      top: -3rem;
+
+      .menu-toggle {
+        transform: rotate(-180deg);
+      }
+    }
 
     h3,
     .button .text {
@@ -195,6 +213,10 @@ aside {
       .material-icons {
         margin-right: 1rem;
       }
+    }
+
+    .footer {
+      opacity: 0;
     }
   }
 

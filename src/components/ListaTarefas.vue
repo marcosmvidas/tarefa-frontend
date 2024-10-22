@@ -1,9 +1,6 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-4 w-full">
-      <h1>Gerenciar Tarefas</h1>
-    <p>Você é um: {{ userRole }}</p>
-    </div>    <div class="flex justify-between items-center mb-4 w-full">
       <div
         class="flex flex-col md:flex-row justify-start items-center w-full md:w-auto"
       >
@@ -25,7 +22,9 @@
           class="bg-green-500 rounded-lg cursor-pointer shadow-sm p-1 hover:bg-blue-500"
           @click="openFormTarefa"
         >
-          <span class="text-white hover:font-semibold p-2">Cadastrar tarefa</span>
+          <span class="text-white hover:font-semibold p-2"
+            >Cadastrar tarefa</span
+          >
         </button>
       </div>
     </div>
@@ -91,6 +90,7 @@
       :total="totalTarefas"
       :limit="perPage"
       @change-page="changePage"
+      class="border-t-2 border-gray-300 py-6"
     />
 
     <SnackbarComponent

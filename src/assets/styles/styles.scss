@@ -1,18 +1,19 @@
 $light-grey: #cccccc;
-$orange: #17487e;
+$orange: #FFAC1C;
+$green: #4CBB17;	
 
 body {
-  background-color: $light-grey;
+  background-color: --light;
 }
 
 .button {
   padding: 10px 15px;
-  background-color: $orange;
+  background-color: $light-grey;
   color: white;
   border: none;
   border-radius: 5px;
 
   &:hover {
-    background-color: darken($orange, 10%);
+    background-color: $green;
   }
 }

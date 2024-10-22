@@ -6,7 +6,7 @@ export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       const response = await api.post('login', credentials);
-      const { token, role_id } = response.data;
+      const { token, role_id  } = response.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('role_id', role_id.toString());
