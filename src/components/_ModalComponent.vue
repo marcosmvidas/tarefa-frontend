@@ -2,7 +2,9 @@
   <div class="modal" v-if="isVisible">
     <div class="modal-overlay"></div>
     <div class="modal-content">
-      <button class="close" @click="closeModal">X</button>
+      <button class="close" @click="closeModal">
+        <span class="text-red-600 text-2xl font-semibold p-3">X</span>
+      </button>
       <slot></slot>
     </div>
   </div>

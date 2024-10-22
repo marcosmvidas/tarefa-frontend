@@ -1,8 +1,17 @@
 <template>
-  <h2 class="p-6 font-bold text-blue-600 bg-slate-200">
-    <strong>CADASTRO TAREFA </strong>
-    <p class="text-blue-400">{{ tarefatask ? 'Edição' : 'Inclusão' }}</p>
-  </h2>
+  <h2
+  class="p-6 font-bold"
+  :class="{
+    'text-blue-600 bg-blue-200'  : tarefatask && tarefatask.id,
+    'text-green-600 bg-green-200': !(tarefatask && tarefatask.id),
+  }"
+>
+  <strong>{{ tarefatask && tarefatask.id ? 'ALTERAÇÃO' : 'CADASTRO' }}</strong>
+  <p :class="tarefatask && tarefatask.id ? 'text-blue-600' : 'text-green-600'">
+    {{ tarefatask && tarefatask.id ? 'Edição da tarefa' : 'Nova tarefa' }}
+  </p>
+</h2>
+
 
   <form @submit.prevent="submitTask">
     <div class="grid grid-cols-12 gap-8 p-12 mb-5">
@@ -149,7 +158,7 @@
 import { defineComponent, ref, watch } from 'vue';
 import { TarefaTypes } from '../types/TarefaTypes';
 import { UserService } from '@/services/userService';
-import { authService } from '@/services/authService'; // Importe o authService
+import { authService } from '@/services/authService';
 
 export default defineComponent({
   props: {
@@ -158,7 +167,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const users = ref<{ id: number; name: string }[]>([]);
-    const roleId = ref(authService.getRoleId()); // Obtém o role_id do usuário logado
+    const roleId = ref(authService.getRoleId());
 
     const fetchUsers = async () => {
       try {
